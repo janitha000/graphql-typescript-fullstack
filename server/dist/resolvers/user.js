@@ -87,6 +87,16 @@ UserResponse = __decorate([
     type_graphql_1.ObjectType()
 ], UserResponse);
 class UserResolver {
+    me({ req }) {
+        return __awaiter(this, void 0, void 0, function* () {
+            console.log(req.session);
+            if (!req.session.userId) {
+                return null;
+            }
+            const user = yield User_1.UserModel.findById(req.session.id);
+            return user;
+        });
+    }
     register(input) {
         return __awaiter(this, void 0, void 0, function* () {
             const { username, password } = input;
@@ -121,11 +131,18 @@ class UserResolver {
                     ]
                 };
             }
-            req.session.qid = user._id;
+            req.session.userId = user._id;
             return { user };
         });
     }
 }
+__decorate([
+    type_graphql_1.Query(() => User_1.default, { nullable: true }),
+    __param(0, type_graphql_1.Ctx()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], UserResolver.prototype, "me", null);
 __decorate([
     type_graphql_1.Mutation(() => User_1.default),
     __param(0, type_graphql_1.Arg('input')),

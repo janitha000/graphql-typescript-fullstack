@@ -7,6 +7,7 @@ import redis from 'redis'
 import session from 'express-session'
 import connectRedis from 'connect-redis'
 
+// import cookieParser from 'cookie-parser'
 // import { typeDefs } from './schema'
 // import { resolvers } from './resolvers'
 import { HelloResolver } from './resolvers/hello';
@@ -18,7 +19,7 @@ import { MyContext } from './types';
 
 declare module 'express-session' {
     export interface SessionData {
-        qid: string
+        userId: string
     }
 }
 
@@ -33,6 +34,8 @@ const main = async () => {
     app.get('/', (_, res) => {
         res.send("Server is working")
     })
+
+    //app.use(cookieParser())
 
     app.use(
         session({
@@ -55,6 +58,12 @@ const main = async () => {
             resolvers: [HelloResolver, PersonResolver, UserResolver],
         }),
         context: ({ req, res }): MyContext => ({ auth, req, res })
+        // context: ({ req, res }): MyContext => {
+        //     const cookie = req.headers.cookie ? req.headers.cookie?.split('=')[1]
+        //         : null
+
+        //     return { req, res, auth, cookie }
+        // },
     })
 
     // const apolloServer = new ApolloServer({

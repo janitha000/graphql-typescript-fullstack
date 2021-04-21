@@ -1,4 +1,4 @@
-import { Arg, Ctx, Field, InputType, Mutation, ObjectType } from "type-graphql";
+import { Arg, Ctx, Field, InputType, Mutation, ObjectType, Query } from "type-graphql";
 import argon2 from 'argon2'
 import User, { UserModel } from "../models/User";
 import { DocumentType } from "@typegoose/typegoose";
@@ -30,6 +30,20 @@ class UserResponse {
 }
 
 export class UserResolver {
+
+
+    @Query(() => User, { nullable: true })
+    async me(@Ctx() { req }: MyContext): Promise<DocumentType<User> | null> {
+        console.log(req.session)
+        if (!req.session.userId) {
+            return null;
+        }
+
+        const user = await UserModel.findById(req.session.id);
+        return user;
+
+    }
+
     @Mutation(() => User)
     async register(
         @Arg('input') input: RegisterInput
@@ -72,7 +86,7 @@ export class UserResolver {
             }
         }
 
-        req.session.qid = user._id;
+        req.session.userId = user._id;
 
         return { user }
     }

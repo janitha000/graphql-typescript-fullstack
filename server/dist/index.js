@@ -15,6 +15,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const apollo_server_express_1 = require("apollo-server-express");
 require("reflect-metadata");
+const mongoose_1 = __importDefault(require("mongoose"));
 const hello_1 = require("./resolvers/hello");
 const type_graphql_1 = require("type-graphql");
 const person_1 = require("./resolvers/person");
@@ -31,8 +32,10 @@ const main = () => __awaiter(void 0, void 0, void 0, function* () {
         context: () => ({ auth })
     });
     apolloServer.applyMiddleware({ app });
-    app.listen(4000, () => {
-        console.log("Server is running on port 4000");
+    mongoose_1.default.connect("mongodb+srv://admin:admin@cluster0.pdksp.mongodb.net/graphql-db?retryWrites=true&w=majority", { useNewUrlParser: true, useUnifiedTopology: true }).then(() => {
+        app.listen(4000, () => {
+            console.log("Server is running on port 4000");
+        });
     });
 });
 main();

@@ -1,5 +1,6 @@
+import { DocumentType } from '@typegoose/typegoose';
 import { Arg, Ctx, ID, Mutation, Query } from 'type-graphql';
-import Person from '../models/Person'
+import Person, { PersoneModel } from '../models/Person'
 import { MyContext } from '../types'
 
 let personList = [
@@ -8,9 +9,10 @@ let personList = [
 ]
 export class PersonResolver {
     @Query(() => [Person])
-    persons(@Ctx() { auth }: MyContext): Person[] {
+    async persons(@Ctx() { auth }: MyContext): Promise<DocumentType<Person>[]> {
         console.log(auth)
-        return personList;
+        let persons = await PersoneModel.find({})
+        return persons;
     }
 
     @Query(() => Person, { nullable: true })
@@ -19,14 +21,14 @@ export class PersonResolver {
     }
 
     @Mutation(() => Person)
-    createPerson(
+    async createPerson(
         @Arg('id') id: string,
         @Arg('firstName') firstName: string,
         @Arg('lastName') lastName: string,
         @Arg('age') age: number,
-    ): Person {
-        let newPerson = new Person(parseInt(id), firstName, lastName, age);
-        personList.push(newPerson)
+    ): Promise<DocumentType<Person>> {
+        let idInt: number = parseInt(id)
+        let newPerson = await PersoneModel.create({ id: idInt, firstName, lastName, age })
 
         return newPerson
     }

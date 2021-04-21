@@ -1,7 +1,7 @@
 import express from 'express';
 import { ApolloServer } from 'apollo-server-express';
 import "reflect-metadata";
-
+import mongoose from 'mongoose'
 // import { typeDefs } from './schema'
 // import { resolvers } from './resolvers'
 import { HelloResolver } from './resolvers/hello';
@@ -33,9 +33,12 @@ const main = async () => {
 
     apolloServer.applyMiddleware({ app });
 
-    app.listen(4000, () => {
-        console.log("Server is running on port 4000")
-    })
+    mongoose.connect("mongodb+srv://admin:admin@cluster0.pdksp.mongodb.net/graphql-db?retryWrites=true&w=majority",
+        { useNewUrlParser: true, useUnifiedTopology: true }).then(() => {
+            app.listen(4000, () => {
+                console.log("Server is running on port 4000")
+            })
+        })
 }
 
 

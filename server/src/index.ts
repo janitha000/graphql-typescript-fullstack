@@ -7,6 +7,7 @@ import mongoose from 'mongoose'
 import { HelloResolver } from './resolvers/hello';
 import { buildSchema } from 'type-graphql';
 import { PersonResolver } from './resolvers/person';
+import { UserResolver } from './resolvers/user';
 
 
 const main = async () => {
@@ -19,7 +20,7 @@ const main = async () => {
 
     const apolloServer = new ApolloServer({
         schema: await buildSchema({
-            resolvers: [HelloResolver, PersonResolver],
+            resolvers: [HelloResolver, PersonResolver, UserResolver],
         }),
         context: () => ({ auth })
     })

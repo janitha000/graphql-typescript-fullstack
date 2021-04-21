@@ -43,10 +43,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.PersonResolver = void 0;
 const type_graphql_1 = require("type-graphql");
 const Person_1 = __importStar(require("../models/Person"));
-let personList = [
-    new Person_1.default(1, "Janitha", "Tennakoon", 31),
-    new Person_1.default(2, "Vindya", "Hettige", 30),
-];
 class PersonResolver {
     persons({ auth }) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -55,13 +51,9 @@ class PersonResolver {
             return persons;
         });
     }
-    person(id) {
-        return personList.find(x => x.id === parseInt(id));
-    }
-    createPerson(id, firstName, lastName, age) {
+    createPerson(firstName, lastName, age) {
         return __awaiter(this, void 0, void 0, function* () {
-            let idInt = parseInt(id);
-            let newPerson = yield Person_1.PersoneModel.create({ id: idInt, firstName, lastName, age });
+            let newPerson = yield Person_1.PersoneModel.create({ firstName, lastName, age });
             return newPerson;
         });
     }
@@ -74,20 +66,12 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], PersonResolver.prototype, "persons", null);
 __decorate([
-    type_graphql_1.Query(() => Person_1.default, { nullable: true }),
-    __param(0, type_graphql_1.Arg('id', () => type_graphql_1.ID)),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String]),
-    __metadata("design:returntype", Object)
-], PersonResolver.prototype, "person", null);
-__decorate([
     type_graphql_1.Mutation(() => Person_1.default),
-    __param(0, type_graphql_1.Arg('id')),
-    __param(1, type_graphql_1.Arg('firstName')),
-    __param(2, type_graphql_1.Arg('lastName')),
-    __param(3, type_graphql_1.Arg('age')),
+    __param(0, type_graphql_1.Arg('firstName')),
+    __param(1, type_graphql_1.Arg('lastName')),
+    __param(2, type_graphql_1.Arg('age')),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, String, String, Number]),
+    __metadata("design:paramtypes", [String, String, Number]),
     __metadata("design:returntype", Promise)
 ], PersonResolver.prototype, "createPerson", null);
 exports.PersonResolver = PersonResolver;

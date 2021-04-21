@@ -13,16 +13,8 @@ import { Field, ID, Int, ObjectType } from "type-graphql";
 @ObjectType()
 class Person {
 
-    constructor(id: Number, firstName: String, lastName: String, age: Number) {
-        this.id = id;
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.age = age;
-    }
-
-    @prop({ required: true })
     @Field(() => ID)
-    id!: Number;
+    _id: string;
 
     @prop({ required: true })
     @Field()

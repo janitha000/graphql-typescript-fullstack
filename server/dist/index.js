@@ -19,6 +19,7 @@ const mongoose_1 = __importDefault(require("mongoose"));
 const hello_1 = require("./resolvers/hello");
 const type_graphql_1 = require("type-graphql");
 const person_1 = require("./resolvers/person");
+const user_1 = require("./resolvers/user");
 const main = () => __awaiter(void 0, void 0, void 0, function* () {
     const auth = "Auth";
     const app = express_1.default();
@@ -27,7 +28,7 @@ const main = () => __awaiter(void 0, void 0, void 0, function* () {
     });
     const apolloServer = new apollo_server_express_1.ApolloServer({
         schema: yield type_graphql_1.buildSchema({
-            resolvers: [hello_1.HelloResolver, person_1.PersonResolver],
+            resolvers: [hello_1.HelloResolver, person_1.PersonResolver, user_1.UserResolver],
         }),
         context: () => ({ auth })
     });

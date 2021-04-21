@@ -16,6 +16,9 @@ const express_1 = __importDefault(require("express"));
 const apollo_server_express_1 = require("apollo-server-express");
 require("reflect-metadata");
 const mongoose_1 = __importDefault(require("mongoose"));
+const redis_1 = __importDefault(require("redis"));
+const express_session_1 = __importDefault(require("express-session"));
+const connect_redis_1 = __importDefault(require("connect-redis"));
 const hello_1 = require("./resolvers/hello");
 const type_graphql_1 = require("type-graphql");
 const person_1 = require("./resolvers/person");
@@ -23,14 +26,29 @@ const user_1 = require("./resolvers/user");
 const main = () => __awaiter(void 0, void 0, void 0, function* () {
     const auth = "Auth";
     const app = express_1.default();
+    const RedisStore = connect_redis_1.default(express_session_1.default);
+    const RedisClient = redis_1.default.createClient();
     app.get('/', (_, res) => {
         res.send("Server is working");
     });
+    app.use(express_session_1.default({
+        name: 'qid',
+        store: new RedisStore({ client: RedisClient, disableTouch: true }),
+        secret: 'safdsfsdfasfasdf',
+        cookie: {
+            maxAge: 1000 * 60 * 60 * 24,
+            httpOnly: true,
+            secure: false,
+            sameSite: 'lax',
+        },
+        resave: false,
+        saveUninitialized: false
+    }));
     const apolloServer = new apollo_server_express_1.ApolloServer({
         schema: yield type_graphql_1.buildSchema({
             resolvers: [hello_1.HelloResolver, person_1.PersonResolver, user_1.UserResolver],
         }),
-        context: () => ({ auth })
+        context: ({ req, res }) => ({ auth, req, res })
     });
     apolloServer.applyMiddleware({ app });
     mongoose_1.default.connect("mongodb+srv://admin:admin@cluster0.pdksp.mongodb.net/graphql-db?retryWrites=true&w=majority", { useNewUrlParser: true, useUnifiedTopology: true }).then(() => {

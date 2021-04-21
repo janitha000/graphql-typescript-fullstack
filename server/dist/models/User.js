@@ -23,7 +23,7 @@ __decorate([
     __metadata("design:type", String)
 ], User.prototype, "_id", void 0);
 __decorate([
-    typegoose_1.prop({ required: true }),
+    typegoose_1.prop({ required: true, unique: true, dropDups: true }),
     type_graphql_1.Field(),
     __metadata("design:type", String)
 ], User.prototype, "username", void 0);

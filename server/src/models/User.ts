@@ -7,7 +7,7 @@ class User {
     @Field(() => ID)
     _id: string
 
-    @prop({ required: true })
+    @prop({ required: true, unique: true, dropDups: true })
     @Field()
     username!: string;
 

@@ -95,7 +95,7 @@ class UserResolver {
             return user;
         });
     }
-    login(input) {
+    login({ req }, input) {
         return __awaiter(this, void 0, void 0, function* () {
             const { username, password } = input;
             const user = yield User_1.UserModel.findOne({ username });
@@ -121,6 +121,7 @@ class UserResolver {
                     ]
                 };
             }
+            req.session.qid = user._id;
             return { user };
         });
     }
@@ -134,9 +135,10 @@ __decorate([
 ], UserResolver.prototype, "register", null);
 __decorate([
     type_graphql_1.Mutation(() => UserResponse),
-    __param(0, type_graphql_1.Arg('input')),
+    __param(0, type_graphql_1.Ctx()),
+    __param(1, type_graphql_1.Arg('input')),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [RegisterInput]),
+    __metadata("design:paramtypes", [Object, RegisterInput]),
     __metadata("design:returntype", Promise)
 ], UserResolver.prototype, "login", null);
 exports.UserResolver = UserResolver;

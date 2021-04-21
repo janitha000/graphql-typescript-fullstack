@@ -1,7 +1,8 @@
-import { Arg, Field, InputType, Mutation, ObjectType } from "type-graphql";
+import { Arg, Ctx, Field, InputType, Mutation, ObjectType } from "type-graphql";
 import argon2 from 'argon2'
 import User, { UserModel } from "../models/User";
 import { DocumentType } from "@typegoose/typegoose";
+import { MyContext } from "src/types";
 
 @InputType()
 class RegisterInput {
@@ -42,6 +43,7 @@ export class UserResolver {
 
     @Mutation(() => UserResponse)
     async login(
+        @Ctx() { req }: MyContext,
         @Arg('input') input: RegisterInput
     ): Promise<UserResponse> {
         const { username, password } = input;
@@ -69,6 +71,8 @@ export class UserResolver {
                 ]
             }
         }
+
+        req.session.qid = user._id;
 
         return { user }
     }

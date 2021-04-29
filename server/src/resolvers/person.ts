@@ -6,8 +6,7 @@ import { MyContext } from '../types'
 
 export class PersonResolver {
     @Query(() => [Person])
-    async persons(@Ctx() { auth }: MyContext): Promise<DocumentType<Person>[]> {
-        console.log(auth)
+    async persons(@Ctx() { }: MyContext): Promise<DocumentType<Person>[]> {
         let persons = await PersoneModel.find({})
         return persons;
     }

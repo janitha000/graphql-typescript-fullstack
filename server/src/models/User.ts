@@ -24,3 +24,5 @@ export const UserModel = getModelForClass(User)
 
 export default User;
 
+
+

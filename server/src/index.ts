@@ -3,9 +3,10 @@ import { ApolloServer } from 'apollo-server-express';
 import "reflect-metadata";
 import mongoose from 'mongoose'
 
-import redis from 'redis'
-import session from 'express-session'
-import connectRedis from 'connect-redis'
+// import redis from 'redis'
+// import session from 'express-session'
+// import connectRedis from 'connect-redis'
+import jwt from 'express-jwt'
 
 // import cookieParser from 'cookie-parser'
 // import { typeDefs } from './schema'
@@ -25,53 +26,49 @@ declare module 'express-session' {
 
 
 const main = async () => {
-    const auth: String = "Auth"
+    // const auth: String = "Auth"
     const app = express();
 
-    const RedisStore = connectRedis(session)
-    const RedisClient = redis.createClient()
+    // const RedisStore = connectRedis(session)
+    // const RedisClient = redis.createClient()
 
     app.get('/', (_, res) => {
         res.send("Server is working")
     })
 
+
+    const jwtAuth: jwt.RequestHandler = jwt({ secret: 'janitha000', credentialsRequired: false, algorithms: ['sha1', 'RS256', 'HS256'] })
+    app.use(jwtAuth)
+
     //app.use(cookieParser())
 
-    app.use(
-        session({
-            name: 'qid',
-            store: new RedisStore({ client: RedisClient, disableTouch: true }),
-            secret: 'safdsfsdfasfasdf',
-            cookie: {
-                maxAge: 1000 * 60 * 60 * 24,
-                httpOnly: true,
-                secure: false,
-                sameSite: 'lax',
-            },
-            resave: false,
-            saveUninitialized: false
-        })
-    )
+    // app.use(
+    //     session({
+    //         name: 'qid',
+    //         store: new RedisStore({ client: RedisClient, disableTouch: true }),
+    //         secret: 'safdsfsdfasfasdf',
+    //         cookie: {
+    //             maxAge: 1000 * 60 * 60 * 24,
+    //             httpOnly: true,
+    //             secure: false,
+    //             sameSite: 'lax',
+    //         },
+    //         resave: false,
+    //         saveUninitialized: false
+    //     })
+    // )
 
     const apolloServer = new ApolloServer({
         schema: await buildSchema({
             resolvers: [HelloResolver, PersonResolver, UserResolver],
         }),
-        context: ({ req, res }): MyContext => ({ auth, req, res })
-        // context: ({ req, res }): MyContext => {
-        //     const cookie = req.headers.cookie ? req.headers.cookie?.split('=')[1]
-        //         : null
+        context: ({ req, res }): MyContext => {
+            const user = req.headers.user ? JSON.parse(req.headers.user as string)
+                : req.user ? req.user : null
+            return { user, req, res }
 
-        //     return { req, res, auth, cookie }
-        // },
+        }
     })
-
-    // const apolloServer = new ApolloServer({
-    //     typeDefs,
-    //     resolvers,
-    //     playground: { endpoint: '/graphql' }
-
-    // })
 
     apolloServer.applyMiddleware({ app });
 

@@ -3,6 +3,7 @@ import argon2 from 'argon2'
 import User, { UserModel } from "../models/User";
 import { DocumentType } from "@typegoose/typegoose";
 import { MyContext } from "src/types";
+import jwt from 'jsonwebtoken'
 
 @InputType()
 class RegisterInput {
@@ -27,20 +28,21 @@ class UserResponse {
     errors?: FieldError[];
     @Field(() => User, { nullable: true })
     user?: User;
+    @Field(() => String, { nullable: true })
+    token?: String
 }
 
 export class UserResolver {
 
 
     @Query(() => User, { nullable: true })
-    async me(@Ctx() { req }: MyContext): Promise<DocumentType<User> | null> {
-        console.log(req.session)
-        if (!req.session.userId) {
+    async me(@Ctx() { user }: MyContext): Promise<DocumentType<User> | null> {
+        if (!user.id) {
             return null;
         }
 
-        const user = await UserModel.findById(req.session.id);
-        return user;
+        const me = await UserModel.findById(user.id);
+        return me;
 
     }
 
@@ -57,11 +59,12 @@ export class UserResolver {
 
     @Mutation(() => UserResponse)
     async login(
-        @Ctx() { req }: MyContext,
+        @Ctx() { }: MyContext,
         @Arg('input') input: RegisterInput
     ): Promise<UserResponse> {
         const { username, password } = input;
         const user = await UserModel.findOne({ username });
+        console.log(user)
         if (!user) {
             return {
                 errors: [
@@ -72,7 +75,7 @@ export class UserResolver {
                 ]
             }
         }
-        console.log(user)
+        console.log(password)
 
         const valid = await argon2.verify(user.password, password);
         if (!valid) {
@@ -86,8 +89,9 @@ export class UserResolver {
             }
         }
 
-        req.session.userId = user._id;
+        const token = jwt.sign({ id: user.id }, 'janitha000', { expiresIn: '1d' })
 
-        return { user }
+
+        return { user, token }
     }
 }

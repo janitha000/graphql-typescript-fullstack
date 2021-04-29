@@ -47,6 +47,7 @@ exports.UserResolver = void 0;
 const type_graphql_1 = require("type-graphql");
 const argon2_1 = __importDefault(require("argon2"));
 const User_1 = __importStar(require("../models/User"));
+const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 let RegisterInput = class RegisterInput {
 };
 __decorate([
@@ -83,18 +84,21 @@ __decorate([
     type_graphql_1.Field(() => User_1.default, { nullable: true }),
     __metadata("design:type", User_1.default)
 ], UserResponse.prototype, "user", void 0);
+__decorate([
+    type_graphql_1.Field(() => String, { nullable: true }),
+    __metadata("design:type", String)
+], UserResponse.prototype, "token", void 0);
 UserResponse = __decorate([
     type_graphql_1.ObjectType()
 ], UserResponse);
 class UserResolver {
-    me({ req }) {
+    me({ user }) {
         return __awaiter(this, void 0, void 0, function* () {
-            console.log(req.session);
-            if (!req.session.userId) {
+            if (!user.id) {
                 return null;
             }
-            const user = yield User_1.UserModel.findById(req.session.id);
-            return user;
+            const me = yield User_1.UserModel.findById(user.id);
+            return me;
         });
     }
     register(input) {
@@ -105,10 +109,11 @@ class UserResolver {
             return user;
         });
     }
-    login({ req }, input) {
+    login({}, input) {
         return __awaiter(this, void 0, void 0, function* () {
             const { username, password } = input;
             const user = yield User_1.UserModel.findOne({ username });
+            console.log(user);
             if (!user) {
                 return {
                     errors: [
@@ -119,7 +124,7 @@ class UserResolver {
                     ]
                 };
             }
-            console.log(user);
+            console.log(password);
             const valid = yield argon2_1.default.verify(user.password, password);
             if (!valid) {
                 return {
@@ -131,8 +136,8 @@ class UserResolver {
                     ]
                 };
             }
-            req.session.userId = user._id;
-            return { user };
+            const token = jsonwebtoken_1.default.sign({ id: user.id }, 'janitha000', { expiresIn: '1d' });
+            return { user, token };
         });
     }
 }

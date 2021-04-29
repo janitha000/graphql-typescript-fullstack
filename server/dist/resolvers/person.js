@@ -44,9 +44,8 @@ exports.PersonResolver = void 0;
 const type_graphql_1 = require("type-graphql");
 const Person_1 = __importStar(require("../models/Person"));
 class PersonResolver {
-    persons({ auth }) {
+    persons({}) {
         return __awaiter(this, void 0, void 0, function* () {
-            console.log(auth);
             let persons = yield Person_1.PersoneModel.find({});
             return persons;
         });
